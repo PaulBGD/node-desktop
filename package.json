@@ -4,11 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "preinstall": "./scripts/build.sh",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "autogypi": "autogypi",
-    "node-gyp": "node-gyp rebuild",
-    "emcc-path": "emcc-path",
-    "copyasm": "copyasm"
+    "node-gyp": "node-gyp rebuild"
   },
   "author": "",
   "license": "MIT",
