@@ -7,12 +7,13 @@ const ListBox = require('./definitions/components/ListBox');
 const ButtonBox = require('./definitions/components/ButtonBox');
 const Button = require('./definitions/components/Button');
 const Label = require('./definitions/components/Label');
+const Entry = require('./definitions/components/Entry');
 
 const app = new App('net.burngames.gtktest');
 const status = app.start(() => {
     const window = new Window(app);
     window.setTitle('My Window');
-    window.setDefaultSize(400, 300);
+    window.center();
 
     const header = new HeaderBar(app);
     header.setTitle('Title');
@@ -23,6 +24,21 @@ const status = app.start(() => {
     const mainButton = new Button(app, 'Debug');
     mainButton.onClick(() => app.enableDebug(true));
     header.addChildToEnd(mainButton);
+
+    const entry = new Entry(app);
+    entry.setStretch(true, false);
+    entry.setText('Wow');
+    entry.setMinCharWidth(30);
+    let progress = 0.0;
+    const interval = setInterval(() => {
+        progress += 0.01;
+        if (progress >= 1.0) {
+            progress = 1;
+            clearInterval(interval);
+        }
+        entry.setProgress(progress);
+    }, 200);
+    header.setWidgetAsTitle(entry);
 
     const box = new Box(app, false);
     box.setStretch(true);
@@ -58,7 +74,11 @@ const status = app.start(() => {
         buttonBox.addChild(button);
     }
 
-    window.showAll();
+    window.onClose(() => {
+        clearInterval(interval);
+    });
+
+    window.show();
 });
 
 console.log('final status:', status);

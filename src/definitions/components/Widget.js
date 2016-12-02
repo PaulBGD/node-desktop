@@ -10,10 +10,6 @@ module.exports = class Widget {
         return this._handle;
     }
 
-    showAll() {
-        gtk.gtk_widget_show_all(this._handle);
-    }
-
     addChild(child) {
         gtk.gtk_container_add(this._handle, child.getHandle());
     }
@@ -52,7 +48,7 @@ module.exports = class Widget {
                 gtk.gtk_widget_set_valign(this.getHandle(), Widget.Align.FILL);
             } else {
                 gtk.gtk_widget_set_hexpand(this.getHandle(), true);
-                gtk.gtk_widget_set_valign(this.getHandle(), Widget.Align.FILL);
+                gtk.gtk_widget_set_halign(this.getHandle(), Widget.Align.FILL);
             }
         }
     }
