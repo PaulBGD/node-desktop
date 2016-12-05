@@ -8,9 +8,18 @@ module.exports = class Box extends Widget {
         this.vertical = !!vertical;
     }
 
+    setSpacing(spacing) {
+        gtk.gtk_box_set_spacing(this.getHandle(), spacing);
+    }
+
     /** override */
     setStretch(stretch) {
         super.setStretch(stretch, this.vertical);
+    }
+
+    insertChild(child, position) {
+        super.addChild(child);
+        gtk.gtk_box_reorder_child(this.getHandle(), child.getHandle(), position);
     }
 
 };

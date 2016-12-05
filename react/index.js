@@ -58,11 +58,23 @@ const Mixin = {
 Object.assign(ReactDesktopReconcileTransaction.prototype, Transaction.Mixin, Mixin);
 PooledClass.addPoolingTo(ReactDesktopReconcileTransaction);
 
-function processChildrenUpdates(updates, components) {
+function processChildrenUpdates(updates, components, operator) {
     for (let i = 0; i < updates.length; i++) {
+        const update = updates[i];
+        const component = components[i];
+        const parent = operator.get(update.parentID);
+        switch (update.type) {
+            case 'INSERT_MARKUP':
+                parent.insertChild(component, update.toIndex);
+                break;
+            case 'REMOVE_NODE':
+                parent.removeChild(update.fromIndex); // yay react for making the component undefined!
+                break;
+            default:
+                console.error('Unknown update type', update);
+        }
         // todo
     }
-    console.log('React Updates', updates);
 }
 
 const nodes = {};
@@ -99,7 +111,7 @@ class ReactDesktopUUIDOperations {
     }
 
     dangerouslyProcessChildrenUpdates(updates, components) {
-        processChildrenUpdates(updates, components);
+        processChildrenUpdates(updates, components, this);
     }
 
     dangerouslyReplaceNodeWithMarkupById(id, markup) {

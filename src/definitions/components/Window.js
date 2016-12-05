@@ -20,7 +20,7 @@ module.exports = class Window extends Widget {
     }
 
     onClose(callback) {
-        gtk.listen(this, 'destroy', callback);
+        this.listen('destroy', callback);
     }
 
     setTitle(title) {

@@ -21,6 +21,10 @@ class Component {
         return this.node;
     }
 
+    _createInstance(clazz, app) {
+        return new (clazz)(app);
+    }
+
     mountComponent(rootID, transaction, context) {
         this._rootNodeID = rootID;
 
@@ -28,7 +32,7 @@ class Component {
 
         const app = operations.getApp();
 
-        this.node = new (this._clazz)(app);
+        this.node = this._createInstance(this._clazz, app);
         operations.add(rootID, this.node, props);
         this.updateProps({}, props);
 
@@ -44,6 +48,16 @@ class Component {
 
     unmountComponent() {
         operations.drop(this._rootNodeID);
+    }
+
+    updateProps(oldProps, props) {
+        if (oldProps.className !== props.className) {
+            const split = (props.className || '').split(' ');
+            this.node.setClassList(split);
+        }
+        if (oldProps.margin !== props.margin) {
+            this.node.setMargin(props.margin);
+        }
     }
 }
 
@@ -107,6 +121,8 @@ module.exports.Window = class Window extends ChildComponent {
     }
 
     updateProps(oldProps, props) {
+        super.updateProps(oldProps, props);
+
         if (oldProps.title !== props.title) {
             this.node.setTitle(props.title);
         }
@@ -136,6 +152,7 @@ module.exports.Button = class Button extends ChildComponent {
     }
 
     updateProps(oldProps, props) {
+        super.updateProps(oldProps, props);
         if (oldProps.label !== props.label) {
             this.node.setLabel(props.label);
         }
@@ -160,5 +177,60 @@ module.exports.ButtonBox = class ButtonBox extends ChildComponent {
 
     updateProps(oldProps, props) {
         // nothing special here
+        super.updateProps(oldProps, props);
+    }
+};
+
+const DesktopBox = require('../src/definitions/components/Box');
+
+module.exports.VerticalBox = class VerticalBox extends ChildComponent {
+    constructor(element) {
+        super(element, DesktopBox);
+    }
+
+    _createInstance(clazz, app) {
+        return new (clazz)(app, true);
+    }
+
+    updateProps(oldProps, props) {
+        super.updateProps(oldProps, props);
+        if (oldProps.spacing !== props.spacing) {
+            this.node.setSpacing(props.spacing);
+        }
+    }
+};
+
+module.exports.HorizontalBox = class HorizontalBox extends ChildComponent {
+    constructor(element) {
+        super(element, DesktopBox);
+    }
+
+    _createInstance(clazz, app) {
+        return new (clazz)(app, false);
+    }
+
+    updateProps(oldProps, props) {
+        super.updateProps(oldProps, props);
+        if (oldProps.spacing !== props.spacing) {
+            this.node.setSpacing(props.spacing);
+        }
+    }
+};
+
+const DesktopLabel = require('../src/definitions/components/Label');
+
+module.exports.Label = class Label extends ChildComponent {
+    constructor(element) {
+        super(element, DesktopLabel);
+
+        this._onClick = false;
+        this._onClickListener = null;
+    }
+
+    updateProps(oldProps, props) {
+        super.updateProps(oldProps, props);
+        if (oldProps.text !== props.text) {
+            this.node.setText(props.text);
+        }
     }
 };

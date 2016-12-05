@@ -7,7 +7,7 @@ module.exports = class Button extends Widget {
     }
 
     onClick(callback) {
-        gtk.listen(this, 'clicked', callback);
+        this.listen('clicked', callback);
     }
 
     setLabel(label) {

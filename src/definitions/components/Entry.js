@@ -3,7 +3,10 @@ const gtk = require('../definitions');
 
 module.exports = class Entry extends Widget {
     constructor(app) {
-        super(app, gtk.gtk_entry_new());
+        console.time('new');
+        const entry = gtk.gtk_entry_new();
+        console.timeEnd('new');
+        super(app, entry);
     }
 
     setMinCharWidth(width) {

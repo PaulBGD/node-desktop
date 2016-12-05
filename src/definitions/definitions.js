@@ -1,15 +1,10 @@
 // hook uv into gtk
-let native;
-try {
-    native = require('../../build/Release/node-desktop.node');
-} catch (err) {
-    console.log(err);
-    native = require('../../build/Debug/node-desktop.node');
-}
+const native = require('bindings')('node-desktop');
 native.StartLoop();
 
 const ref = require('ref');
 const ffi = require('ffi');
+const StructType = require('ref-struct');
 
 const GtkApplicationPointer = ref.refType(ref.types.void);
 const GtkWidgetPointer = ref.refType(ref.types.void);
@@ -24,8 +19,11 @@ module.exports = gtk = ffi.Library('libgtk-3', {
 
     gtk_application_new: [GtkApplicationPointer, ['string', 'int']],
     g_signal_connect_data: [ref.types.void, [GtkApplicationPointer, ref.types.CString, FunctionPointer, 'pointer', 'pointer', 'int']],
-    g_application_run: ['int', [GtkApplicationPointer, 'int', ref.types.CString]],
+    g_application_run: ['int', [GtkApplicationPointer, 'int', ref.refType(ref.types.void)]],
     g_object_unref: [ref.types.void, [GtkApplicationPointer]],
+
+    // screen stuff
+    gdk_screen_get_default: [ref.refType(ref.types.void), []],
 
     // general widget stuff
     gtk_widget_show_all: [ref.types.void, [ref.refType(ref.types.void)]],
@@ -38,7 +36,20 @@ module.exports = gtk = ffi.Library('libgtk-3', {
     gtk_widget_set_valign: ['void', [GtkWidgetPointer, 'int']],
     gtk_widget_set_hexpand: ['void', [GtkWidgetPointer, 'bool']],
     gtk_widget_set_halign: ['void', [GtkWidgetPointer, 'int']],
+    gtk_widget_get_style_context: [ref.refType(ref.types.void), [GtkWidgetPointer]],
+
+    // container
     gtk_container_add: [ref.types.void, [GtkWidgetPointer, GtkWidgetPointer]],
+    gtk_container_remove: [ref.types.void, [GtkWidgetPointer, GtkWidgetPointer]],
+
+    // style context
+    gtk_style_context_add_class: ['void', [ref.refType(ref.types.void), 'string']],
+    gtk_style_context_remove_class: ['void', [ref.refType(ref.types.void), 'string']],
+    gtk_style_context_add_provider_for_screen: ['void', [ref.refType(ref.types.void), ref.refType(ref.types.void), 'int']],
+
+    // css provider
+    gtk_css_provider_new: [ref.refType(ref.types.void), []],
+    gtk_css_provider_load_from_data: ['bool', [ref.refType(ref.types.void), 'string', 'int', ref.refType(ref.types.void)]],
 
     // window defs
     gtk_application_window_new: [GtkWidgetPointer, [GtkApplicationPointer]],
@@ -54,6 +65,8 @@ module.exports = gtk = ffi.Library('libgtk-3', {
 
     // box
     gtk_box_new: [GtkWidgetPointer, ['int', 'int']],
+    gtk_box_reorder_child: ['void', [GtkWidgetPointer, GtkWidgetPointer, 'int']],
+    gtk_box_set_spacing: ['void', [GtkWidgetPointer, 'int']],
 
     // list box
     gtk_list_box_new: [GtkWidgetPointer, []],
@@ -92,6 +105,20 @@ module.exports = gtk = ffi.Library('libgtk-3', {
     gtk_entry_buffer_set_text: ['void', [GtkEntryBufferPointer, 'string', 'int']],
 });
 
+module.exports.StyleProvider = {
+    FALLBACK: 1,
+    THEME: 200,
+    SETTINGS: 400,
+    APPLICATION: 600,
+    USER: 800
+};
+
+module.exports.GError = StructType({
+    domain: ref.types.uint32,
+    code: ref.types.long,
+    message: ref.types.CString
+});
+
 module.exports.listen = function (widget, event, callback) {
     function eventCallback() {
         try {
@@ -102,4 +129,5 @@ module.exports.listen = function (widget, event, callback) {
     }
     const cb = ffi.Callback('void', [], eventCallback);
     gtk.g_signal_connect_data(widget.getHandle(), event, cb, null, null, 0);
+    return cb;
 };

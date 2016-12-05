@@ -25,7 +25,9 @@ const status = app.start(() => {
     mainButton.onClick(() => app.enableDebug(true));
     header.addChildToEnd(mainButton);
 
+    console.time('setup');
     const entry = new Entry(app);
+    console.timeEnd('setup');
     entry.setStretch(true, false);
     entry.setText('Wow');
     entry.setMinCharWidth(30);
@@ -67,6 +69,7 @@ const status = app.start(() => {
     for (let i = 0; i < 30; i++) {
         let times = 0;
         const button = new Button(app, 'Click Me');
+        button.addClass('my-button');
         button.onClick(() => {
             button.setLabel(`Clicked ${++times} times`);
         });
@@ -75,8 +78,18 @@ const status = app.start(() => {
     }
 
     window.onClose(() => {
+        console.log('closed');
         clearInterval(interval);
     });
+
+    app.addStyles(`.my-button {
+    background-color: pink;
+    padding: 20px 40px;
+}
+
+.my-button:hover {
+    background-color: purple;
+}`);
 
     window.show();
 });
