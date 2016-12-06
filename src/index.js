@@ -25,9 +25,7 @@ const status = app.start(() => {
     mainButton.onClick(() => app.enableDebug(true));
     header.addChildToEnd(mainButton);
 
-    console.time('setup');
     const entry = new Entry(app);
-    console.timeEnd('setup');
     entry.setStretch(true, false);
     entry.setText('Wow');
     entry.setMinCharWidth(30);
