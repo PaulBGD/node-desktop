@@ -7,6 +7,8 @@ module.exports = class Widget {
         this._listeners = [];
         this._children = [];
         this._classes = [];
+
+        this.stretchy = false;
     }
 
     getHandle() {

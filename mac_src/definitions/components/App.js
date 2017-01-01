@@ -13,7 +13,11 @@ module.exports = class App {
 
         const AppDelegate = objc.NSObject.extend('AppDelegate');
         AppDelegate.addMethod('applicationDidFinishLaunching:', 'v@:@', (self, _cmd, notif) => {
-            callback();
+            try {
+                callback();
+            } catch (err) {
+                console.error('Error thrown inside of application', err);
+            }
         });
 
         AppDelegate.addMethod('applicationWillTerminate:', 'v@:@', (self, _cmd, notif) => {
