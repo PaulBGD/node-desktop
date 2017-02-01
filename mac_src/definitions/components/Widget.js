@@ -7,4 +7,12 @@ module.exports = class Widget {
     getHandle() {
         return this._handle;
     }
+
+    _hugsEdge() {
+        return true;
+    }
+
+    _hugsBottom() {
+        return false;
+    }
 };
